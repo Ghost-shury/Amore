@@ -141,23 +141,3 @@ window.mostraTesto = function () {
     `;
 };
 
-window.mostraFoto = function () {
-    document.getElementById("contenuto").innerHTML = `
-        <h2>I nostri ricordi 📸</h2>
-        <button id="comingSoonBtn" style="
-            padding:15px 25px;
-            font-size:18px;
-            border:none;
-            border-radius:15px;
-            background:#4CAF50;
-            color:white;
-            cursor:pointer;
-        ">
-            Coming soon ✨
-        </button>
-    `;
-
-    document.getElementById("comingSoonBtn").addEventListener("click", function () {
-        alert("In futuro metterò nuove cose per te ❤️");
-    });
-};
