@@ -70,7 +70,7 @@ img {
     <button onclick="controlla()">Entra ❤️</button>
 </div>
 
-<!-- CONTENUTO -->
+<!-- APP -->
 <div id="app" style="display:none;">
     <h1>Per te amore mio ❤️</h1>
 
@@ -90,7 +90,7 @@ img {
 function controlla() {
     let pass = document.getElementById("password").value;
 
-    if(pass === "orsacchiotta") {
+    if (pass === "orsacchiotta") {
         document.getElementById("login").style.display = "none";
         document.getElementById("app").style.display = "block";
     } else {
@@ -123,7 +123,7 @@ function mostraTesto() {
     `;
 }
 
-// FOTO CON SALVATAGGIO
+// FOTO (SALVATE SOLO SU QUESTO DISPOSITIVO)
 function mostraFoto() {
     document.getElementById("contenuto").innerHTML = `
         <h2>I nostri ricordi 📸</h2>
@@ -135,6 +135,8 @@ function mostraFoto() {
 
 function salvaFoto(event) {
     const file = event.target.files[0];
+    if (!file) return;
+
     const reader = new FileReader();
 
     reader.onload = function(e) {
@@ -142,13 +144,15 @@ function salvaFoto(event) {
         immagini.push(e.target.result);
         localStorage.setItem("foto", JSON.stringify(immagini));
         caricaFoto();
-    }
+    };
 
     reader.readAsDataURL(file);
 }
 
 function caricaFoto() {
     const galleria = document.getElementById("galleria");
+    if (!galleria) return;
+
     galleria.innerHTML = "";
 
     let immagini = JSON.parse(localStorage.getItem("foto")) || [];
@@ -181,4 +185,3 @@ setInterval(creaCuore, 300);
 
 </body>
 </html>
-mi puoi spiegare quale la password
