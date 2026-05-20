@@ -141,82 +141,23 @@ window.mostraTesto = function () {
     `;
 };
 
-// 📸 FOTO CONDIVISE + ELIMINAZIONE
 window.mostraFoto = function () {
     document.getElementById("contenuto").innerHTML = `
         <h2>I nostri ricordi 📸</h2>
-        <input type="file" id="fileInput">
-        <div id="galleria"></div>
+        <button id="comingSoonBtn" style="
+            padding:15px 25px;
+            font-size:18px;
+            border:none;
+            border-radius:15px;
+            background:#4CAF50;
+            color:white;
+            cursor:pointer;
+        ">
+            Coming soon ✨
+        </button>
     `;
 
-    document.getElementById("fileInput").addEventListener("change", uploadFoto);
-
-    ascoltaFoto();
+    document.getElementById("comingSoonBtn").addEventListener("click", function () {
+        alert("In futuro metterò nuove cose per te ❤️");
+    });
 };
-
-// UPLOAD FOTO
-async function uploadFoto(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const storageRef = ref(storage, "foto/" + Date.now());
-
-    await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
-
-    await addDoc(collection(db, "foto"), {
-        url: url,
-        time: Date.now()
-    });
-}
-
-// ASCOLTO FOTO IN TEMPO REALE
-function ascoltaFoto() {
-    const q = collection(db, "foto");
-
-    onSnapshot(q, (snapshot) => {
-        const galleria = document.getElementById("galleria");
-        if (!galleria) return;
-
-        galleria.innerHTML = "";
-
-        snapshot.forEach(docSnap => {
-            const data = docSnap.data();
-
-            const container = document.createElement("div");
-            container.style.position = "relative";
-            container.style.display = "inline-block";
-
-            const img = document.createElement("img");
-            img.src = data.url;
-
-            const btn = document.createElement("button");
-            btn.innerHTML = "🗑";
-            btn.style.position = "absolute";
-            btn.style.top = "10px";
-            btn.style.right = "10px";
-            btn.style.border = "none";
-            btn.style.borderRadius = "50%";
-            btn.style.padding = "8px";
-            btn.style.cursor = "pointer";
-            btn.style.background = "rgba(0,0,0,0.6)";
-            btn.style.color = "white";
-
-            btn.onclick = async () => {
-                await fetchDelete(docSnap.id);
-            };
-
-            container.appendChild(img);
-            container.appendChild(btn);
-
-            galleria.appendChild(container);
-        });
-    });
-}
-
-// ELIMINAZIONE FOTO
-import { deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-async function fetchDelete(id) {
-    await deleteDoc(doc(db, "foto", id));
-}
