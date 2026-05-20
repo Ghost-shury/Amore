@@ -141,7 +141,7 @@ window.mostraTesto = function () {
     `;
 };
 
-// 📸 FOTO CONDIVISE (FIREBASE)
+// 📸 FOTO CONDIVISE + ELIMINAZIONE
 window.mostraFoto = function () {
     document.getElementById("contenuto").innerHTML = `
         <h2>I nostri ricordi 📸</h2>
@@ -154,8 +154,11 @@ window.mostraFoto = function () {
     ascoltaFoto();
 };
 
+// UPLOAD FOTO
 async function uploadFoto(e) {
     const file = e.target.files[0];
+    if (!file) return;
+
     const storageRef = ref(storage, "foto/" + Date.now());
 
     await uploadBytes(storageRef, file);
@@ -167,40 +170,53 @@ async function uploadFoto(e) {
     });
 }
 
-// LIVE UPDATE FOTO
+// ASCOLTO FOTO IN TEMPO REALE
 function ascoltaFoto() {
     const q = collection(db, "foto");
 
     onSnapshot(q, (snapshot) => {
         const galleria = document.getElementById("galleria");
+        if (!galleria) return;
+
         galleria.innerHTML = "";
 
-        snapshot.forEach(doc => {
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+
+            const container = document.createElement("div");
+            container.style.position = "relative";
+            container.style.display = "inline-block";
+
             const img = document.createElement("img");
-            img.src = doc.data().url;
-            galleria.appendChild(img);
+            img.src = data.url;
+
+            const btn = document.createElement("button");
+            btn.innerHTML = "🗑";
+            btn.style.position = "absolute";
+            btn.style.top = "10px";
+            btn.style.right = "10px";
+            btn.style.border = "none";
+            btn.style.borderRadius = "50%";
+            btn.style.padding = "8px";
+            btn.style.cursor = "pointer";
+            btn.style.background = "rgba(0,0,0,0.6)";
+            btn.style.color = "white";
+
+            btn.onclick = async () => {
+                await fetchDelete(docSnap.id);
+            };
+
+            container.appendChild(img);
+            container.appendChild(btn);
+
+            galleria.appendChild(container);
         });
     });
 }
 
-// CUORI
-function creaCuore() {
-    const cuore = document.createElement("div");
-    cuore.classList.add("cuore");
-    cuore.innerHTML = "❤️";
+// ELIMINAZIONE FOTO
+import { deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    cuore.style.left = Math.random() * 100 + "vw";
-    cuore.style.animationDuration = (Math.random() * 3 + 2) + "s";
-    cuore.style.fontSize = (Math.random() * 20 + 10) + "px";
-
-    document.body.appendChild(cuore);
-
-    setTimeout(() => cuore.remove(), 5000);
+async function fetchDelete(id) {
+    await deleteDoc(doc(db, "foto", id));
 }
-
-setInterval(creaCuore, 300);
-
-</script>
-
-</body>
-</html>
