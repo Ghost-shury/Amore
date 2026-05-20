@@ -70,7 +70,7 @@ img {
     <button onclick="controlla()">Entra ❤️</button>
 </div>
 
-<!-- APP -->
+<!-- CONTENUTO -->
 <div id="app" style="display:none;">
     <h1>Per te amore mio ❤️</h1>
 
@@ -84,28 +84,10 @@ img {
     </audio>
 </div>
 
-<!-- FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-
-// 🔴 METTI QUI I TUOI DATI FIREBASE
-const firebaseConfig = {
-  apiKey: "XXX",
-  authDomain: "XXX",
-  projectId: "XXX",
-  storageBucket: "XXX",
-  messagingSenderId: "XXX",
-  appId: "XXX"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+<script>
 
 // PASSWORD
-window.controlla = function () {
+function controlla() {
     let pass = document.getElementById("password").value;
 
     if(pass === "orsacchiotta") {
@@ -114,10 +96,10 @@ window.controlla = function () {
     } else {
         alert("Password sbagliata 😢");
     }
-};
+}
 
-// TESTO (UGUALE AL TUO)
-window.mostraTesto = function () {
+// TESTO COMPLETO
+function mostraTesto() {
     document.getElementById("contenuto").innerHTML = `
     <div class="lettera">
     <p>Amore mio,</p>
@@ -139,5 +121,64 @@ window.mostraTesto = function () {
     <p>E non smetterò mai di dimostrartelo. ❤️</p>
     </div>
     `;
-};
+}
 
+// FOTO CON SALVATAGGIO
+function mostraFoto() {
+    document.getElementById("contenuto").innerHTML = `
+        <h2>I nostri ricordi 📸</h2>
+        <input type="file" accept="image/*" onchange="salvaFoto(event)">
+        <div id="galleria"></div>
+    `;
+    caricaFoto();
+}
+
+function salvaFoto(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        let immagini = JSON.parse(localStorage.getItem("foto")) || [];
+        immagini.push(e.target.result);
+        localStorage.setItem("foto", JSON.stringify(immagini));
+        caricaFoto();
+    }
+
+    reader.readAsDataURL(file);
+}
+
+function caricaFoto() {
+    const galleria = document.getElementById("galleria");
+    galleria.innerHTML = "";
+
+    let immagini = JSON.parse(localStorage.getItem("foto")) || [];
+
+    immagini.forEach(src => {
+        const img = document.createElement("img");
+        img.src = src;
+        galleria.appendChild(img);
+    });
+}
+
+// CUORI
+function creaCuore() {
+    const cuore = document.createElement("div");
+    cuore.classList.add("cuore");
+    cuore.innerHTML = "❤️";
+
+    cuore.style.left = Math.random() * 100 + "vw";
+    cuore.style.animationDuration = (Math.random() * 3 + 2) + "s";
+    cuore.style.fontSize = (Math.random() * 20 + 10) + "px";
+
+    document.body.appendChild(cuore);
+
+    setTimeout(() => cuore.remove(), 5000);
+}
+
+setInterval(creaCuore, 300);
+
+</script>
+
+</body>
+</html>
+mi puoi spiegare quale la password
