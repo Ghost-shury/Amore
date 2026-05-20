@@ -70,7 +70,7 @@ img {
     <button onclick="controlla()">Entra ❤️</button>
 </div>
 
-<!-- CONTENUTO -->
+<!-- APP -->
 <div id="app" style="display:none;">
     <h1>Per te amore mio ❤️</h1>
 
@@ -84,10 +84,28 @@ img {
     </audio>
 </div>
 
-<script>
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+// 🔴 METTI QUI I TUOI DATI FIREBASE
+const firebaseConfig = {
+  apiKey: "XXX",
+  authDomain: "XXX",
+  projectId: "XXX",
+  storageBucket: "XXX",
+  messagingSenderId: "XXX",
+  appId: "XXX"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
 // PASSWORD
-function controlla() {
+window.controlla = function () {
     let pass = document.getElementById("password").value;
 
     if(pass === "orsacchiotta") {
@@ -96,10 +114,10 @@ function controlla() {
     } else {
         alert("Password sbagliata 😢");
     }
-}
+};
 
-// TESTO COMPLETO
-function mostraTesto() {
+// TESTO (UGUALE AL TUO)
+window.mostraTesto = function () {
     document.getElementById("contenuto").innerHTML = `
     <div class="lettera">
     <p>Amore mio,</p>
@@ -121,42 +139,47 @@ function mostraTesto() {
     <p>E non smetterò mai di dimostrartelo. ❤️</p>
     </div>
     `;
-}
+};
 
-// FOTO CON SALVATAGGIO
-function mostraFoto() {
+// 📸 FOTO CONDIVISE (FIREBASE)
+window.mostraFoto = function () {
     document.getElementById("contenuto").innerHTML = `
         <h2>I nostri ricordi 📸</h2>
-        <input type="file" accept="image/*" onchange="salvaFoto(event)">
+        <input type="file" id="fileInput">
         <div id="galleria"></div>
     `;
-    caricaFoto();
+
+    document.getElementById("fileInput").addEventListener("change", uploadFoto);
+
+    ascoltaFoto();
+};
+
+async function uploadFoto(e) {
+    const file = e.target.files[0];
+    const storageRef = ref(storage, "foto/" + Date.now());
+
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+
+    await addDoc(collection(db, "foto"), {
+        url: url,
+        time: Date.now()
+    });
 }
 
-function salvaFoto(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
+// LIVE UPDATE FOTO
+function ascoltaFoto() {
+    const q = collection(db, "foto");
 
-    reader.onload = function(e) {
-        let immagini = JSON.parse(localStorage.getItem("foto")) || [];
-        immagini.push(e.target.result);
-        localStorage.setItem("foto", JSON.stringify(immagini));
-        caricaFoto();
-    }
+    onSnapshot(q, (snapshot) => {
+        const galleria = document.getElementById("galleria");
+        galleria.innerHTML = "";
 
-    reader.readAsDataURL(file);
-}
-
-function caricaFoto() {
-    const galleria = document.getElementById("galleria");
-    galleria.innerHTML = "";
-
-    let immagini = JSON.parse(localStorage.getItem("foto")) || [];
-
-    immagini.forEach(src => {
-        const img = document.createElement("img");
-        img.src = src;
-        galleria.appendChild(img);
+        snapshot.forEach(doc => {
+            const img = document.createElement("img");
+            img.src = doc.data().url;
+            galleria.appendChild(img);
+        });
     });
 }
 
