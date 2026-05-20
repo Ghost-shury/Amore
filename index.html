@@ -86,9 +86,9 @@ img {
 
 <script>
 
-// PASSWORD
+// LOGIN (FIX DEFINITIVO)
 function controlla() {
-    let pass = document.getElementById("password").value;
+    const pass = document.getElementById("password").value;
 
     if (pass === "orsacchiotta") {
         document.getElementById("login").style.display = "none";
@@ -123,7 +123,7 @@ function mostraTesto() {
     `;
 }
 
-// FOTO (SALVATE SOLO SU QUESTO DISPOSITIVO)
+// FOTO (LOCAL STORAGE - FUNZIONA SEMPRE)
 function mostraFoto() {
     document.getElementById("contenuto").innerHTML = `
         <h2>I nostri ricordi 📸</h2>
